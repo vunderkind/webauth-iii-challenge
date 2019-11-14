@@ -1,4 +1,4 @@
-exports.up = function(knex, Promise) {
+exports.up = function(knex) {
     // don't forget the return statement
     return knex.schema.createTable('login', tbl => {
       // creates a primary key called id
@@ -12,7 +12,7 @@ exports.up = function(knex, Promise) {
     });
   };
   
-  exports.down = function(knex, Promise) {
+  exports.down = function(knex) {
     // drops the entire table
     return knex.schema.dropTableIfExists('login');
   };

@@ -7,8 +7,8 @@ module.exports = {
 }
 
 function getAllData() {
-    return db('login');
-};
+    return db('login').select('id', 'username');
+}
 
 function add(data) {
     return db('login')

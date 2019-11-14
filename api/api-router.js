@@ -7,18 +7,9 @@ const router = express.Router();
 const session = require('express-session');
 const restricted = require('./restricted-bcrypt');
 const cookieprotected = require('./sessionRestrictor');
+const cookie = require('./cookie');
 
-const sessionConfig = {
-  name: "monkey",
-  secret: "Fight me",
-  cookie: {
-      maxAge: 1000 * 60 * 60,
-      secure: false,
-      httpOnly: true,
-  },
-  resave: false,
-  saveUnintialized: false,
-}
+const sessionConfig = cookie;
 
 // configure express-session middleware
 router.use(session(sessionConfig));

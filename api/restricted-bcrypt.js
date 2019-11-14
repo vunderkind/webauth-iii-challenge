@@ -16,7 +16,7 @@ module.exports = function restricted(req, res, next) {
           }
         })
         .catch(error => {
-          res.status(500).json({ message: 'Unexpected error' });
+          res.status(500).json({ message: `Unexpected error: ${error}` });
         });
     } else {
       res.status(400).json({ message: 'No credentials provided' });

@@ -1,20 +1,21 @@
 const express = require('express');
 
-const helper = require('./api-helper');
+const helper = require('./api-helper.js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
-const session = require('express-session');
-const restricted = require('./restricted-bcrypt');
-const cookieprotected = require('./sessionRestrictor');
-const cookie = require('./cookie');
+// const session = require('express-session');
+// const restricted = require('./middleware/restricted-bcrypt');
+// const cookieprotected = require('./middleware/sessionRestrictor');
+// const cookie = require('./cookie');
 const secrets = require('../config/secrets');
+const jwtrestriction = require('../api/middleware/jwtRestriction.js');
 
-const sessionConfig = cookie;
+// const sessionConfig = cookie;
 
 // configure express-session middleware
-router.use(session(sessionConfig));
+// router.use(session(sessionConfig));
 
 router.get('/', (req, res) => {
   res.status(200).send('<img src="https://media.giphy.com/media/d3Kq5w84bzlBLVDO/giphy.gif" alt="it\'s alive"/>')
@@ -22,14 +23,14 @@ router.get('/', (req, res) => {
 
 
 //Get a restricted list of users - cookie path
-router.get('/users', cookieprotected, (req, res) => {
+router.get('/users', jwtrestriction, (req, res) => {
   helper.getAllData()
       .then(data => {
       res.send(data)
   });
 });
 // restricted list of users bcrypt middleware path 
-router.get('/api/users', restricted, (req, res) => {
+router.get('/api/users', (req, res) => {
   helper.getAllData()
       .then(data => {
       res.send(data)
@@ -53,16 +54,16 @@ credentials.password = hash;
 
 router.post('/login', (req, res) => {
   const {username, password} = req.body;
-  req.session.userID = username;
+  // req.session.userID = username;
   helper.findByUsername(username)
   .then(user => {
   if(!user || !bcrypt.compareSync(password, user.password)) {
-      req.session.user = user;
+      // req.session.user = user;
       return res.status(401).json({error: `Incorrect Creds`})
   } else {
     const token = generateToken(user);
       return res.status(200).json({
-        message: `Welcome, ${user.username}!`,
+        message: `Welcome, ${user.username}! You are in the ${user.department} department`,
         Token: token,
       })
   }
@@ -93,5 +94,7 @@ function generateToken(user) {
   }
   return jwt.sign(payload, secrets.jwtsecret, options)
 }
+
+
 
 module.exports = router;

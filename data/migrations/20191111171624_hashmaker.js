@@ -4,10 +4,15 @@ exports.up = function(knex) {
       // creates a primary key called id
       tbl.increments();
       // creates a text field called name which is both required and unique
-      tbl.string('username', 128).unique().notNullable();
-      // creates a numeric field called budget which is required
+      tbl.string('username', 128)
+      .unique()
+      .notNullable();
+      // creates a numeric field called password
       tbl.string('password', 128)
       .unique()
+      .notNullable();
+
+      tbl.string('department', 128)
       .notNullable();
     });
   };

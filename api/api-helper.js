@@ -4,10 +4,15 @@ module.exports = {
     getAllData,
     add,
     findByUsername,
+    getMatchingDepartments
 }
 
 function getAllData() {
-    return db('login').select('id', 'username');
+    return db('login').select('id', 'username', 'department');
+}
+
+function getMatchingDepartments() {
+    return db('login').select('id', 'username', 'department');
 }
 
 function add(data) {

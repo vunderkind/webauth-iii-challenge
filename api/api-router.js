@@ -5,17 +5,17 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
-// const session = require('express-session');
-// const restricted = require('./middleware/restricted-bcrypt');
-// const cookieprotected = require('./middleware/sessionRestrictor');
-// const cookie = require('./cookie');
+const session = require('express-session');
+const restricted = require('./middleware/restricted-bcrypt');
+const cookieprotected = require('./middleware/sessionRestrictor');
+const cookie = require('./cookie');
 const secrets = require('../config/secrets');
 const jwtrestriction = require('../api/middleware/jwtRestriction.js');
 
-// const sessionConfig = cookie;
+const sessionConfig = cookie;
 
 // configure express-session middleware
-// router.use(session(sessionConfig));
+router.use(session(sessionConfig));
 
 router.get('/', (req, res) => {
   res.status(200).send('<img src="https://media.giphy.com/media/d3Kq5w84bzlBLVDO/giphy.gif" alt="it\'s alive"/>')
@@ -45,7 +45,7 @@ const hash = bcrypt.hashSync(credentials.password, 14);
 credentials.password = hash;
   helper.add(credentials)
   .then(() => {
-          return res.status(401).json({message:  `New details: ${credentials.username}`})
+          return res.status(401).json({message:  `New details: ${credentials.username}, posted to the ${credentials.department} department. Have fun on your first day!`})
       });
 
 });
@@ -64,7 +64,7 @@ router.post('/login', (req, res) => {
     const token = generateToken(user);
       return res.status(200).json({
         message: `Welcome, ${user.username}! You are in the ${user.department} department`,
-        Token: token,
+        user_token: token,
       })
   }
   })
@@ -72,7 +72,7 @@ router.post('/login', (req, res) => {
 
 //implementing log out
 router.get('/logout', (req, res) => {
-  if (req.session) {
+  if (req.headers) {
     req.session.destroy(err => {
       if (err) {
         res.send('error logging out');

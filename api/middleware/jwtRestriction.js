@@ -1,9 +1,15 @@
 const jwt = require('jsonwebtoken');
+const secrets = require('../../config/secrets');
 
 module.exports = (req, res, next) => {
-    const token = req.headers.authorization
+    const tokenBear = req.headers.authorization;
+    if(!tokenBear) {
+        res.status(401).json({message: 'no token, so you cannot pass!'})
+    }
+    const token = tokenBear.substring(7, tokenBear.length);
+    
     if(token){
-        const secret = 'Hello Daisy'
+        const secret = secrets.jwtsecret;
 
         jwt.verify(token, secret, (error, decodedToken) => {
             if(error){

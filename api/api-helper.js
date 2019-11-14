@@ -11,8 +11,8 @@ function getAllData() {
     return db('login').select('id', 'username', 'department');
 }
 
-function getMatchingDepartments() {
-    return db('login').select('id', 'username', 'department');
+function getMatchingDepartments(departments) {
+    return db('login').where(departments).next();
 }
 
 function add(data) {

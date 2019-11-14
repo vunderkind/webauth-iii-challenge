@@ -2,12 +2,14 @@ const express = require('express');
 
 const helper = require('./api-helper');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 const session = require('express-session');
 const restricted = require('./restricted-bcrypt');
 const cookieprotected = require('./sessionRestrictor');
 const cookie = require('./cookie');
+const secrets = require('../config/secrets');
 
 const sessionConfig = cookie;
 
@@ -58,7 +60,11 @@ router.post('/login', (req, res) => {
       req.session.user = user;
       return res.status(401).json({error: `Incorrect Creds`})
   } else {
-      return res.status(200).json({message: `Welcome, ${user.username}!`})
+    const token = generateToken(user);
+      return res.status(200).json({
+        message: `Welcome, ${user.username}!`,
+        Token: token,
+      })
   }
   })
 });
@@ -75,5 +81,17 @@ router.get('/logout', (req, res) => {
     });
   }
 });
+
+function generateToken(user) {
+  const payload = {
+    sub: user.id,
+    username: user.username,
+    //never pass passwords as this thing ain't encrypted
+  };
+  const options = {
+    expiresIn: '8h',
+  }
+  return jwt.sign(payload, secrets.jwtsecret, options)
+}
 
 module.exports = router;

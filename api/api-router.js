@@ -1,10 +1,12 @@
 const express = require('express');
 
 const helper = require('./api-helper');
+const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 const session = require('express-session');
 const restricted = require('./restricted-bcrypt');
+const cookieprotected = require('./sessionRestrictor');
 
 const sessionConfig = {
   name: "monkey",
@@ -21,21 +23,6 @@ const sessionConfig = {
 // configure express-session middleware
 router.use(session(sessionConfig));
 
-function cookieprotected(req, res, next) {
-  if (req.session && req.session.userID) {
-    next();
-  } else {
-    res.status(401).json({ message: 'you shall not pass!!' });
-  }
-}
-
-
-
-
-
-//an api called users. When we query it, it returns all the users in the db we created
-
-
 router.get('/', (req, res) => {
   res.status(200).send('<img src="https://media.giphy.com/media/d3Kq5w84bzlBLVDO/giphy.gif" alt="it\'s alive"/>')
 });
@@ -48,7 +35,7 @@ router.get('/users', cookieprotected, (req, res) => {
       res.send(data)
   });
 });
-// bcrypt middleware
+// restricted list of users bcrypt middleware path 
 router.get('/api/users', restricted, (req, res) => {
   helper.getAllData()
       .then(data => {
@@ -63,7 +50,7 @@ const credentials = req.body;
 const hash = bcrypt.hashSync(credentials.password, 14);
 credentials.password = hash;
   helper.add(credentials)
-  .then(data => {
+  .then(() => {
           return res.status(401).json({message:  `New details: ${credentials.username}`})
       });
 
